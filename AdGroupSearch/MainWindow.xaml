@@ -4,10 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AdGroupSearch"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:vm="clr-namespace:AdGroupSearch.ViewModels"
+        xmlns:converters="clr-namespace:AdGroupSearch.Converters"
         mc:Ignorable="d"
         Title="AD Group Search" Height="600" Width="350">
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter"/>
+    </Window.Resources>
+    
     <Window.DataContext>
         <vm:MainWindowModel/>
     </Window.DataContext>
@@ -19,20 +23,18 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBox x:Name="FilterTextBox" Text="{Binding FilterText}">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="TextChanged">
-                    <i:InvokeCommandAction Command="{Binding FilterGroups}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </TextBox>
+        <TextBox x:Name="FilterTextBox" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <ListView x:Name="GroupsListView" Grid.Row="1" Margin="0,5,0,0">
+        <ListView x:Name="GroupsListView" ItemsSource="{Binding Groups}" Grid.Row="1" Margin="0,5,0,0">
             
         </ListView>
 
-        <Grid Grid.Row="2" Margin="0,5,0,0">
-            
-        </Grid>
+        <Border Visibility="{Binding IsLoadingGroups, Converter={StaticResource BoolVisibilityConverter}}" Padding="0,5" Grid.Row="2" Margin="0,5,0,0">
+            <Border.Background>
+                <SolidColorBrush Color="Yellow" Opacity=".5"/>
+            </Border.Background>
+
+            <TextBlock TextAlignment="Center" FontSize="15">UPDATING GROUP CACHE</TextBlock>
+        </Border>
     </Grid>
 </Window>

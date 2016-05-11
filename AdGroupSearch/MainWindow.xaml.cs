@@ -1,6 +1,8 @@
-﻿using System;
+﻿using AdGroupSearch.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,6 +25,12 @@ namespace AdGroupSearch
         public MainWindow()
         {
             InitializeComponent();
+
+            Observable.FromEventPattern(this, nameof(MainWindow.Activated))
+                .Skip(1)
+                .Subscribe(_ => ViewModel.CheckCache.Execute(null));
         }
+
+        MainWindowModel ViewModel => (MainWindowModel)DataContext;
     }
 }
