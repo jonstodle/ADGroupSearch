@@ -7,13 +7,14 @@
         xmlns:vm="clr-namespace:AdGroupSearch.ViewModels"
         xmlns:converters="clr-namespace:AdGroupSearch.Converters"
         mc:Ignorable="d"
-        Title="AD Group Search" Height="600" Width="350">
+        Icon="Assets/icon.ico"
+        Title="AD Group Search" Height="600" Width="700" MinHeight="300" MinWidth="300">
     <Window.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter"/>
     </Window.Resources>
     
     <Window.DataContext>
-        <vm:MainWindowModel/>
+        <vm:MainWindowModel x:Name="VM"/>
     </Window.DataContext>
     
     <Grid Margin="5">
@@ -21,12 +22,38 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
         <TextBox x:Name="FilterTextBox" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <ListView x:Name="GroupsListView" ItemsSource="{Binding Groups}" Grid.Row="1" Margin="0,5,0,0">
-            
+            <Button x:Name="MenuButton" Grid.Column="1" Margin="5,0,0,0">
+                <Button.ContextMenu>
+                    <ContextMenu x:Name="MenuButtonContextMenu">
+                        <MenuItem Header="Update cache" Command="{Binding LoadGroups, Source={x:Reference Name=VM}}">
+                            <MenuItem.Icon>
+                                <Image Source="Assets/refresh.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </Button.ContextMenu>
+
+                <Image Source="Assets/gear.png"/>
+            </Button>
+        </Grid>
+
+        <ListView x:Name="GroupsListView" ItemsSource="{Binding ListCollectionView}" Grid.Row="1" Margin="0,5,0,0">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" Width="270" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Description" Width="370" DisplayMemberBinding="{Binding Description}" />
+                </GridView>
+            </ListView.View>
         </ListView>
 
         <Border Visibility="{Binding IsLoadingGroups, Converter={StaticResource BoolVisibilityConverter}}" Padding="0,5" Grid.Row="2" Margin="0,5,0,0">
@@ -36,5 +63,14 @@
 
             <TextBlock TextAlignment="Center" FontSize="15">UPDATING GROUP CACHE</TextBlock>
         </Border>
+
+        <Grid Grid.Row="3" Margin="0,5,0,0">
+            <TextBlock>
+                <Run Text="Showing "/>
+                <Run Text="{Binding ListCollectionView.Count, Mode=OneWay}"/>
+                <Run Text=" of "/>
+                <Run Text="{Binding Groups.Count, Mode=OneWay}"/>
+            </TextBlock>
+        </Grid>
     </Grid>
 </Window>

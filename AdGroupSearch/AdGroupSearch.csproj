@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -136,7 +139,21 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Assets\gear.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\icon-128.png" />
+    <Resource Include="Assets\icon-16.png" />
+    <Resource Include="Assets\icon-256.png" />
+    <Resource Include="Assets\icon-32.png" />
+    <Resource Include="Assets\icon-64.png" />
+    <Resource Include="Assets\icon-96.png" />
+    <Resource Include="Assets\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\refresh.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

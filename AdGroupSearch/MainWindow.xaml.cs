@@ -29,6 +29,13 @@ namespace AdGroupSearch
             Observable.FromEventPattern(this, nameof(MainWindow.Activated))
                 .Skip(1)
                 .Subscribe(_ => ViewModel.CheckCache.Execute(null));
+
+            Observable.FromEventPattern<RoutedEventArgs>(MenuButton, nameof(Button.Click))
+                .Subscribe(e =>
+                {
+                    MenuButtonContextMenu.PlacementTarget = e.Sender as Button;
+                    MenuButtonContextMenu.IsOpen = true;
+                });
         }
 
         MainWindowModel ViewModel => (MainWindowModel)DataContext;

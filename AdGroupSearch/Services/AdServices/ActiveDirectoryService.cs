@@ -19,7 +19,7 @@ namespace AdGroupSearch.Services.AdServices
 
         PrincipalContext GetPrincipalContext() => new PrincipalContext(ContextType.Domain);
 
-        DirectoryEntry GetDirectoryEntry() => new DirectoryEntry("LDAP://OU=Foretak,DC=sikt,DC=sykehuspartner,DC=no");
+        DirectoryEntry GetDirectoryEntry() => new DirectoryEntry("LDAP://DC=sikt,DC=sykehuspartner,DC=no");
 
         public Task<IEnumerable<SearchResult>> GetAdGroupsAsync(string searchTerm, params string[] propertiesToLoad)
         {
@@ -28,12 +28,16 @@ namespace AdGroupSearch.Services.AdServices
                 using (var entry = GetDirectoryEntry())
                 using (var searcher = new DirectorySearcher(entry))
                 {
+                    searcher.PageSize = 1000;
                     searcher.Filter = $"(&(objectCategory=group)(samaccountname={searchTerm}))";
 
                     foreach (var prop in propertiesToLoad) { searcher.PropertiesToLoad.Add(prop); }
 
                     var returnValue = new List<SearchResult>();
-                    foreach (var result in searcher.FindAll()) { returnValue.Add((SearchResult)result); }
+                    using (var results = searcher.FindAll())
+                    {
+                        foreach (var result in results) { returnValue.Add((SearchResult)result); } 
+                    }
 
                     return returnValue;
                 }

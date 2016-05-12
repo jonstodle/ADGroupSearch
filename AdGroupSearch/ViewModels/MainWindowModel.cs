@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 
 namespace AdGroupSearch.ViewModels
 {
@@ -21,7 +22,9 @@ namespace AdGroupSearch.ViewModels
         private ObservableAsPropertyHelper<bool> isLoadingGroups;
         public bool IsLoadingGroups => isLoadingGroups.Value;
 
-        private string filterText;
+        public ListCollectionView ListCollectionView { get; set; }
+
+        private string filterText = string.Empty;
         public string FilterText
         {
             get { return filterText; }
@@ -45,6 +48,16 @@ namespace AdGroupSearch.ViewModels
 
 
             LoadGroups.IsExecuting.ToProperty(this, x => x.IsLoadingGroups, out isLoadingGroups);
+
+
+
+            ListCollectionView = new ListCollectionView(Groups);
+
+            ListCollectionView.Filter = TextFilter;
+
+
+
+            this.WhenAnyValue(x => x.FilterText).Subscribe(x => ListCollectionView?.Refresh());
 
 
 
@@ -108,6 +121,29 @@ namespace AdGroupSearch.ViewModels
             {
                 Groups.AddRange(cache.Item2);
             }
+        }
+
+        bool TextFilter(object item)
+        {
+            if (string.IsNullOrWhiteSpace(FilterText)) { return true; }
+
+            var itm = (ActiveDirectoryGroup)item;
+
+            var itmString = $"{itm.Name} {itm.Description}".ToLowerInvariant();
+            var filterString = FilterText.Replace(" ", string.Empty).ToLowerInvariant();
+
+            var idx = 0;
+
+            foreach (var letter in itmString)
+            {
+                if(letter == filterString[idx])
+                {
+                    idx += 1;
+                    if (idx >= filterString.Length) { return true; }
+                }
+            }
+
+            return false;
         }
     }
 }
