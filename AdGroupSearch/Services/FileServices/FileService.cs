@@ -21,9 +21,9 @@ namespace AdGroupSearch.Services.FileServices
 
         string DataFolderName => @"\AD Group Search";
 
-        public string DataFileName => $@"\GroupCache.json";
+        public string GroupCacheFileName => $@"\GroupCache.json";
 
-        public string FullDataFilePath => $@"{DataFolderName}{DataFileName}";
+        public string FullDataFilePath => $@"{DataFolderName}{GroupCacheFileName}";
 
         public bool SaveToDisk<T>(string location, T data)
         {

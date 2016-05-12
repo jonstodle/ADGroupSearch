@@ -106,7 +106,7 @@ namespace AdGroupSearch.ViewModels
         {
             Tuple<DateTimeOffset, List<ActiveDirectoryGroup>> cache;
 
-            if (!FileService.Current.FileExists(Environment.SpecialFolder.LocalApplicationData, FileService.Current.DataFileName))
+            if (!FileService.Current.FileExists(Environment.SpecialFolder.LocalApplicationData, FileService.Current.GroupCacheFileName))
             {
                 cache = new Tuple<DateTimeOffset, List<ActiveDirectoryGroup>>(DateTimeOffset.UtcNow - TimeSpan.FromDays(10), new List<ActiveDirectoryGroup>());
             }
