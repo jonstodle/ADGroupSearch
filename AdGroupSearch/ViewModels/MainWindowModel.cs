@@ -1,6 +1,7 @@
 ﻿using AdGroupSearch.Models;
 using AdGroupSearch.Services.AdServices;
 using AdGroupSearch.Services.FileServices;
+using AdGroupSearch.Views;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,8 @@ namespace AdGroupSearch.ViewModels
         public DateTimeOffset CacheTimestamp { get; set; }
 
         public ReactiveCommand<object> CheckCache { get; set; }
+
+        public ReactiveCommand<object> OpenSettingsWindow { get; set; }
 
 
 
@@ -78,6 +81,12 @@ namespace AdGroupSearch.ViewModels
             });
 
             CheckCache.Execute(null);
+
+
+
+            OpenSettingsWindow = ReactiveCommand.Create();
+
+            OpenSettingsWindow.Subscribe(_ => (new SettingsWindow()).ShowDialog());
         }
 
 
