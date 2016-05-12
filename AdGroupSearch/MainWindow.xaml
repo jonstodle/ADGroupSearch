@@ -40,6 +40,12 @@
                                 <Image Source="Assets/refresh.png"/>
                             </MenuItem.Icon>
                         </MenuItem>
+
+                        <MenuItem Header="Settings" Command="{Binding OpenSettingsWindow}">
+                            <MenuItem.Icon>
+                                <Image Source="Assets/gear.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
                     </ContextMenu>
                 </Button.ContextMenu>
 
