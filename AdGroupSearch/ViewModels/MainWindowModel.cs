@@ -72,7 +72,7 @@ namespace AdGroupSearch.ViewModels
 
 
 
-            this.WhenAnyValue(x => x.FilterText, y=> y.UseFuzzyMatch).Subscribe(x => ListCollectionView?.Refresh());
+            this.WhenAnyValue(x => x.FilterText, y => y.UseFuzzyMatch).Subscribe(x => ListCollectionView?.Refresh());
 
 
 
@@ -105,29 +105,35 @@ namespace AdGroupSearch.ViewModels
 
         private async Task LoadGroupsImpl()
         {
-            var applGroups = (await ActiveDirectoryService.Current.GetAdGroupsAsync(SettingsService.Current.GetSetting<string>("GroupFilter"), "name", "description")).ToList();
+            var adGroups = (await ActiveDirectoryService.Current.GetAdGroupsAsync(SettingsService.Current.GetSetting<string>("GroupFilter"), "name", "description")).ToList();
 
-            if (string.IsNullOrWhiteSpace(Cache.GroupFilter) || Cache.GroupFilter != SettingsService.Current.GetSetting<string>("GroupFilter")) { Groups.Clear(); }
-
-            for (int i = 0; i < applGroups.Count; i++)
+            using (Groups.SuppressChangeNotifications())
             {
-                var group = applGroups[i];
+                Groups.Clear();
+                Groups.AddRange(await Task.Run<IEnumerable<ActiveDirectoryGroup>>(() =>
+                {
+                    var groupList = new List<ActiveDirectoryGroup>();
 
-                var groupName = group.Properties["name"][0].ToString();
-                var groupDesc = group.Properties["description"].Count != 0 ? group.Properties["description"][0].ToString() : string.Empty;
+                    foreach (var group in adGroups)
+                    {
+                        var groupName = group.Properties["name"][0].ToString();
+                        var groupDesc = group.Properties["description"].Count != 0 ? group.Properties["description"][0].ToString() : string.Empty;
 
-                var newGroup = new ActiveDirectoryGroup(groupName, groupDesc);
-                var existingGroup = Groups.FirstOrDefault(x => x.Name.Contains(newGroup.Name));
+                        groupList.Add(new ActiveDirectoryGroup(groupName, groupDesc));
+                    }
 
-                if (existingGroup != null) { Groups[Groups.IndexOf(existingGroup)] = newGroup; }
-                else { Groups.Add(newGroup); }
+                    return groupList;
+                })); 
             }
 
-            Cache.Items = Groups.ToList();
-            Cache.Timestamp = DateTimeOffset.UtcNow;
-            Cache.GroupFilter = SettingsService.Current.GetSetting<string>("GroupFilter");
+            await Task.Run(() =>
+            {
+                Cache.Items = Groups.ToList();
+                Cache.Timestamp = DateTimeOffset.UtcNow;
+                Cache.GroupFilter = SettingsService.Current.GetSetting<string>("GroupFilter");
 
-            FileService.Current.WriteToLocalAppData(FileService.GroupCacheFileName, Cache);
+                FileService.Current.WriteToLocalAppData(FileService.GroupCacheFileName, Cache);
+            });
         }
 
         private void LoadCache()
