@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Environment;
 
 namespace AdGroupSearch.Services.FileServices
 {
@@ -19,24 +18,19 @@ namespace AdGroupSearch.Services.FileServices
 
 
 
-        string DataFolderName => @"\AD Group Search";
+        string ApplicationFolderName => "AD Group Search";
 
-        public string GroupCacheFileName => $@"\GroupCache.json";
+        string GetFilePath(string location, string fileName) => $@"{location}\{ApplicationFolderName}\{fileName}";
 
-        public string FullDataFilePath => $@"{DataFolderName}{GroupCacheFileName}";
-
-        public bool SaveToDisk<T>(string location, T data)
+        public bool WriteToDisk<T>(string location, string fileName, T data)
         {
             try
             {
-                var dataBuilder = new StringBuilder();
+                if (!Directory.Exists($@"{location}\{ApplicationFolderName}")) { Directory.CreateDirectory($@"{location}\{ApplicationFolderName}"); }
 
-                dataBuilder.AppendLine(DateTimeOffset.UtcNow.ToString());
-                dataBuilder.AppendLine(JsonConvert.SerializeObject(data));
 
-                if(!Directory.Exists(location + DataFolderName)) { Directory.CreateDirectory(location + DataFolderName); }
+                File.WriteAllText(GetFilePath(location, fileName), JsonConvert.SerializeObject(data));
 
-                File.WriteAllText(location + FullDataFilePath, dataBuilder.ToString());
 
                 return true;
             }
@@ -46,26 +40,20 @@ namespace AdGroupSearch.Services.FileServices
             }
         }
 
-        public bool SaveToDisk<T>(SpecialFolder folder, T data) => SaveToDisk<T>(Environment.GetFolderPath(folder), data);
-
-
-        public Tuple<DateTimeOffset, T> LoadFromDisk<T>(string location)
+        public T ReadFromDisk<T>(string location, string fileName)
         {
-            var lines = File.ReadAllLines(location + FullDataFilePath);
-            return new Tuple<DateTimeOffset, T>(DateTimeOffset.Parse(lines[0]), JsonConvert.DeserializeObject<T>(lines[1]));
+            if(!File.Exists(GetFilePath(location, fileName))) { return default(T); }
+
+
+            return JsonConvert.DeserializeObject<T>(File.ReadAllText(GetFilePath(location, fileName)));
         }
 
-        public Tuple<DateTimeOffset, T> LoadFromDisk<T>(SpecialFolder folder) => LoadFromDisk<T>(Environment.GetFolderPath(folder));
 
+        public static string GroupCacheFileName => "GroupCache.json";
+        public static string AppSettingsFileName => "AppSettings.json";
 
-        public bool FileExists(string location, string fileName)
-        {
-            return File.Exists(location + DataFolderName + $@"\{fileName}");
-        }
+        public bool WriteToLocalAppData<T>(string fileName, T data) => WriteToDisk(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), fileName, data);
 
-        public bool FileExists(SpecialFolder folder, string fileName)
-        {
-            return FileExists(Environment.GetFolderPath(folder), fileName);
-        }
+        public T ReadFromLocalAppData<T>(string fileName) => ReadFromDisk<T>(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), fileName);
     }
 }

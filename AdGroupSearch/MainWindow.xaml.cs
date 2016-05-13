@@ -30,6 +30,15 @@ namespace AdGroupSearch
                 .Skip(1)
                 .Subscribe(_ => ViewModel.CheckCache.Execute(null));
 
+            Observable.FromEventPattern(this, nameof(MainWindow.Activated))
+                .Delay(TimeSpan.FromMilliseconds(100))
+                .ObserveOnDispatcher()
+                .Subscribe(x =>
+                {
+                    FilterTextBox.Focus();
+                    FilterTextBox.SelectAll();
+                });
+
             Observable.FromEventPattern<RoutedEventArgs>(MenuButton, nameof(Button.Click))
                 .Subscribe(e =>
                 {

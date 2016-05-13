@@ -99,8 +99,10 @@
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Launch.cs" />
     <Compile Include="Models\ActiveDirectoryGroup.cs" />
+    <Compile Include="Models\CacheContainer.cs" />
     <Compile Include="Services\AdServices\ActiveDirectoryService.cs" />
     <Compile Include="Services\FileServices\FileService.cs" />
+    <Compile Include="Services\SettingsServices\SettingsService.cs" />
     <Compile Include="ViewModels\MainWindowModel.cs" />
     <Compile Include="ViewModels\SettingsWindowModel.cs" />
     <Compile Include="Views\SettingsWindow.xaml.cs">

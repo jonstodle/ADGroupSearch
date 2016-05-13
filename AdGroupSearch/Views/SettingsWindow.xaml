@@ -11,14 +11,26 @@
     <Window.DataContext>
         <vm:SettingsWindowModel/>
     </Window.DataContext>
-    
-    <Grid>
+
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
         <ListView>
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Padding" Value="0,5"/>
                 </Style>
             </ListView.ItemContainerStyle>
+
+            <ListView.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                </Style>
+            </ListView.Resources>
 
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -28,8 +40,23 @@
 
                 <TextBlock Text="Domain: "/>
 
-                <TextBox Grid.Column="1"/>
+                <TextBox Text="{Binding Domain, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1"/>
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Group filter: "/>
+
+                <TextBox Text="{Binding GroupFilter, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1"/>
             </Grid>
         </ListView>
+
+        <Grid Grid.Row="1" Margin="0,5,0,0">
+            <Button HorizontalAlignment="Right" Command="{Binding SaveSettings}">Save</Button>
+        </Grid>
     </Grid>
 </Window>

@@ -1,6 +1,7 @@
 ﻿using AdGroupSearch.Models;
 using AdGroupSearch.Services.AdServices;
 using AdGroupSearch.Services.FileServices;
+using AdGroupSearch.Services.SettingsServices;
 using AdGroupSearch.Views;
 using ReactiveUI;
 using System;
@@ -32,7 +33,14 @@ namespace AdGroupSearch.ViewModels
             set { this.RaiseAndSetIfChanged(ref filterText, value); }
         }
 
-        public DateTimeOffset CacheTimestamp { get; set; }
+        private bool useFuzzyMatch = true;
+        public bool UseFuzzyMatch
+        {
+            get { return useFuzzyMatch; }
+            set { this.RaiseAndSetIfChanged(ref useFuzzyMatch, value); }
+        }
+
+        public CacheContainer Cache { get; set; }
 
         public ReactiveCommand<object> CheckCache { get; set; }
 
@@ -42,6 +50,10 @@ namespace AdGroupSearch.ViewModels
 
         public MainWindowModel()
         {
+            SettingsService.Init();
+
+
+
             Groups = new ReactiveList<ActiveDirectoryGroup>();
 
 
@@ -60,11 +72,11 @@ namespace AdGroupSearch.ViewModels
 
 
 
-            this.WhenAnyValue(x => x.FilterText).Subscribe(x => ListCollectionView?.Refresh());
+            this.WhenAnyValue(x => x.FilterText, y=> y.UseFuzzyMatch).Subscribe(x => ListCollectionView?.Refresh());
 
 
 
-            CacheTimestamp = DateTimeOffset.UtcNow - TimeSpan.FromDays(10);
+            Cache = new CacheContainer();
 
             LoadCache();
 
@@ -74,7 +86,7 @@ namespace AdGroupSearch.ViewModels
 
             CheckCache.Subscribe(_ =>
             {
-                if (DateTimeOffset.UtcNow - CacheTimestamp > TimeSpan.FromDays(5) && !IsLoadingGroups)
+                if (DateTimeOffset.UtcNow - Cache.Timestamp > TimeSpan.FromDays(5) && !IsLoadingGroups)
                 {
                     LoadGroups.Execute(null);
                 }
@@ -93,43 +105,46 @@ namespace AdGroupSearch.ViewModels
 
         private async Task LoadGroupsImpl()
         {
-            var applGroups = await ActiveDirectoryService.Current.GetAdGroupsAsync("Appl *", "name");
+            var applGroups = (await ActiveDirectoryService.Current.GetAdGroupsAsync(SettingsService.Current.GetSetting<string>("GroupFilter"), "name", "description")).ToList();
 
-            foreach (var group in applGroups)
+            if (string.IsNullOrWhiteSpace(Cache.GroupFilter) || Cache.GroupFilter != SettingsService.Current.GetSetting<string>("GroupFilter")) { Groups.Clear(); }
+
+            for (int i = 0; i < applGroups.Count; i++)
             {
-                var groupName = group.Properties["name"][0].ToString();
-                var existingGroup = Groups.FirstOrDefault(x => x.Name.Contains(groupName));
-                var loadedGroup = await ActiveDirectoryService.Current.GetPrincipalForGroupAsync(groupName);
+                var group = applGroups[i];
 
-                var newGroup = new ActiveDirectoryGroup(loadedGroup.Name, loadedGroup.Description);
+                var groupName = group.Properties["name"][0].ToString();
+                var groupDesc = group.Properties["description"].Count != 0 ? group.Properties["description"][0].ToString() : string.Empty;
+
+                var newGroup = new ActiveDirectoryGroup(groupName, groupDesc);
+                var existingGroup = Groups.FirstOrDefault(x => x.Name.Contains(newGroup.Name));
 
                 if (existingGroup != null) { Groups[Groups.IndexOf(existingGroup)] = newGroup; }
                 else { Groups.Add(newGroup); }
             }
 
-            CacheTimestamp = DateTimeOffset.UtcNow;
-            FileService.Current.SaveToDisk(Environment.SpecialFolder.LocalApplicationData, Groups.ToList());
+            Cache.Items = Groups.ToList();
+            Cache.Timestamp = DateTimeOffset.UtcNow;
+            Cache.GroupFilter = SettingsService.Current.GetSetting<string>("GroupFilter");
+
+            FileService.Current.WriteToLocalAppData(FileService.GroupCacheFileName, Cache);
         }
 
         private void LoadCache()
         {
-            Tuple<DateTimeOffset, List<ActiveDirectoryGroup>> cache;
+            Cache = FileService.Current.ReadFromLocalAppData<CacheContainer>(FileService.GroupCacheFileName);
 
-            if (!FileService.Current.FileExists(Environment.SpecialFolder.LocalApplicationData, FileService.Current.GroupCacheFileName))
+            if (Cache == default(CacheContainer))
             {
-                cache = new Tuple<DateTimeOffset, List<ActiveDirectoryGroup>>(DateTimeOffset.UtcNow - TimeSpan.FromDays(10), new List<ActiveDirectoryGroup>());
+                Cache = new CacheContainer { Timestamp = DateTimeOffset.UtcNow - TimeSpan.FromDays(10) };
             }
-            else
-            {
-                cache = FileService.Current.LoadFromDisk<List<ActiveDirectoryGroup>>(Environment.SpecialFolder.LocalApplicationData);
-            }
-
-            CacheTimestamp = cache.Item1;
 
             using (Groups.SuppressChangeNotifications())
             {
-                Groups.AddRange(cache.Item2);
+                Groups.AddRange(Cache.Items);
             }
+
+            Cache.Items = null;
         }
 
         bool TextFilter(object item)
@@ -139,16 +154,27 @@ namespace AdGroupSearch.ViewModels
             var itm = (ActiveDirectoryGroup)item;
 
             var itmString = $"{itm.Name} {itm.Description}".ToLowerInvariant();
-            var filterString = FilterText.Replace(" ", string.Empty).ToLowerInvariant();
 
-            var idx = 0;
-
-            foreach (var letter in itmString)
+            if (UseFuzzyMatch)
             {
-                if(letter == filterString[idx])
+                var filterString = FilterText.Replace(" ", string.Empty).ToLowerInvariant();
+
+                var idx = 0;
+
+                foreach (var letter in itmString)
                 {
-                    idx += 1;
-                    if (idx >= filterString.Length) { return true; }
+                    if (letter == filterString[idx])
+                    {
+                        idx += 1;
+                        if (idx >= filterString.Length) { return true; }
+                    }
+                }
+            }
+            else
+            {
+                if (itmString.Contains(FilterText.ToLowerInvariant()))
+                {
+                    return true;
                 }
             }
 
