@@ -11,6 +11,10 @@
         Title="AD Group Search" Height="600" Width="700" MinHeight="300" MinWidth="300">
     <Window.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter"/>
+
+        <ContextMenu x:Key="GroupsContextMenu">
+            <MenuItem Header="Copy group name" Command="{Binding CopyGroupNameToClipboard, Source={x:Reference Name=VM}}"/>
+        </ContextMenu>
     </Window.Resources>
 
     <Window.DataContext>
@@ -57,13 +61,19 @@
             </Button>
         </Grid>
 
-        <ListView x:Name="GroupsListView" ItemsSource="{Binding ListCollectionView}" Grid.Row="1" Margin="0,5,0,0">
+        <ListView x:Name="GroupsListView" ItemsSource="{Binding ListCollectionView}" SelectedItem="{Binding SelectedItem}" Grid.Row="1" Margin="0,5,0,0">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Name" Width="270" DisplayMemberBinding="{Binding Name}" />
                     <GridViewColumn Header="Description" Width="370" DisplayMemberBinding="{Binding Description}" />
                 </GridView>
             </ListView.View>
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="ContextMenu" Value="{StaticResource GroupsContextMenu}"/>
+                </Style>
+            </ListView.ItemContainerStyle>
         </ListView>
 
         <Border Visibility="{Binding IsLoadingGroups, Converter={StaticResource BoolVisibilityConverter}}" Padding="0,5" Grid.Row="2" Margin="0,5,0,0">

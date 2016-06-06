@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 
 namespace AdGroupSearch.ViewModels
@@ -45,6 +46,15 @@ namespace AdGroupSearch.ViewModels
         public ReactiveCommand<object> CheckCache { get; set; }
 
         public ReactiveCommand<object> OpenSettingsWindow { get; set; }
+
+        private object selectedItem;
+        public object SelectedItem
+        {
+            get { return selectedItem; }
+            set { this.RaiseAndSetIfChanged(ref selectedItem, value); }
+        }
+
+        public ReactiveCommand<object> CopyGroupNameToClipboard { get; set; }
 
 
 
@@ -99,6 +109,12 @@ namespace AdGroupSearch.ViewModels
             OpenSettingsWindow = ReactiveCommand.Create();
 
             OpenSettingsWindow.Subscribe(_ => (new SettingsWindow()).ShowDialog());
+
+
+
+            CopyGroupNameToClipboard = ReactiveCommand.Create();
+
+            CopyGroupNameToClipboard.Subscribe(_ => Clipboard.SetText(((ActiveDirectoryGroup)SelectedItem).Name));
         }
 
 
