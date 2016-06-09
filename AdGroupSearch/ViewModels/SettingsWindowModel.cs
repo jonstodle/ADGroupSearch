@@ -1,4 +1,5 @@
-﻿using AdGroupSearch.Services.SettingsServices;
+﻿using AdGroupSearch.Interfaces;
+using AdGroupSearch.Services.SettingsServices;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -44,11 +45,13 @@ namespace AdGroupSearch.ViewModels
 
             SaveSettings = ReactiveCommand.Create(saveSettingsCanExecute);
 
-            SaveSettings.Subscribe(_ =>
+            SaveSettings.Subscribe(view =>
             {
                 SettingsService.Current.SetSetting(nameof(Domain), Domain);
                 SettingsService.Current.SetSetting(nameof(GroupFilter), GroupFilter);
                 SettingsService.Current.SaveSettings();
+
+                ((IClosable)view).Close();
             });
         }
     }

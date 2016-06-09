@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdGroupSearch.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +18,7 @@ namespace AdGroupSearch.Views
     /// <summary>
     /// Interaction logic for SettingsWindow.xaml
     /// </summary>
-    public partial class SettingsWindow : Window
+    public partial class SettingsWindow : Window, IClosable
     {
         public SettingsWindow()
         {
