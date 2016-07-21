@@ -34,7 +34,7 @@ namespace AdGroupSearch.ViewModels
             set { this.RaiseAndSetIfChanged(ref filterText, value); }
         }
 
-        private bool useFuzzyMatch = true;
+        private bool useFuzzyMatch;
         public bool UseFuzzyMatch
         {
             get { return useFuzzyMatch; }
