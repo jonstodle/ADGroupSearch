@@ -43,7 +43,7 @@ namespace AdGroupSearch.Services.SettingsServices
             return new Dictionary<string, object>()
             {
                 { "Domain", "sikt.sykehuspartner.no" },
-                {"GroupFilter", "Appl *" }
+                {"GroupFilter", "*" }
             };
         }
 
