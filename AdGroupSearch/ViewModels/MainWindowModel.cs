@@ -6,9 +6,12 @@ using AdGroupSearch.Views;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -76,13 +79,18 @@ namespace AdGroupSearch.ViewModels
 
 
 
-            ListCollectionView = new ListCollectionView(Groups);
+			ListCollectionView = new ListCollectionView(Groups)
+			{
+				SortDescriptions = { new SortDescription("Name", ListSortDirection.Ascending) }
+			};
 
             ListCollectionView.Filter = TextFilter;
 
 
 
-            this.WhenAnyValue(x => x.FilterText, y => y.UseFuzzyMatch).Subscribe(x => ListCollectionView?.Refresh());
+            this.WhenAnyValue(x => x.FilterText, y => y.UseFuzzyMatch)
+				.Throttle(TimeSpan.FromSeconds(.5), DispatcherScheduler.Current)
+				.Subscribe(x => ListCollectionView?.Refresh());
 
 
 
