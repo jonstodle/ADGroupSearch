@@ -177,28 +177,22 @@ namespace AdGroupSearch.ViewModels
 
             var itmString = $"{itm.Name} {itm.Description}".ToLowerInvariant();
 
-            if (UseFuzzyMatch)
-            {
-                var filterString = FilterText.Replace(" ", string.Empty).ToLowerInvariant();
+			if (UseFuzzyMatch)
+			{
+				var filterString = FilterText.Replace(" ", string.Empty).ToLowerInvariant();
 
-                var idx = 0;
+				var idx = 0;
 
-                foreach (var letter in itmString)
-                {
-                    if (letter == filterString[idx])
-                    {
-                        idx += 1;
-                        if (idx >= filterString.Length) { return true; }
-                    }
-                }
-            }
-            else
-            {
-                if (itmString.Contains(FilterText.ToLowerInvariant()))
-                {
-                    return true;
-                }
-            }
+				foreach (var letter in itmString)
+				{
+					if (letter == filterString[idx])
+					{
+						idx += 1;
+						if (idx >= filterString.Length) { return true; }
+					}
+				}
+			}
+			else return FilterText.Split(' ').All(x => itmString.Contains(x));
 
             return false;
         }
