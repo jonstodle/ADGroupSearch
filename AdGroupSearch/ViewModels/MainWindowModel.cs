@@ -200,7 +200,7 @@ namespace AdGroupSearch.ViewModels
 					}
 				}
 			}
-			else return FilterText.Split(' ').All(x => itmString.Contains(x));
+			else return FilterText.ToLowerInvariant().Split(' ').All(x => itmString.Contains(x));
 
             return false;
         }
