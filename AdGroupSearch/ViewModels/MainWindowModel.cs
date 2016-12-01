@@ -123,6 +123,10 @@ namespace AdGroupSearch.ViewModels
             CopyGroupNameToClipboard = ReactiveCommand.Create();
 
             CopyGroupNameToClipboard.Subscribe(_ => Clipboard.SetText(((ActiveDirectoryGroup)SelectedItem).Name));
+
+
+
+			FilterText = Environment.GetCommandLineArgs().Skip(1).FirstOrDefault();
         }
 
 
