@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace AdGroupSearch.Services.AdServices
 
         PrincipalContext GetPrincipalContext() => new PrincipalContext(ContextType.Domain);
 
-        DirectoryEntry GetDirectoryEntry() => new DirectoryEntry($"LDAP://{SettingsService.Current.GetSetting<string>("Domain")}");
+        DirectoryEntry GetDirectoryEntry() => new DirectoryEntry($"LDAP://{Domain.GetCurrentDomain().Name}");
 
         public Task<IEnumerable<SearchResult>> GetAdGroupsAsync(string searchTerm, params string[] propertiesToLoad)
         {
