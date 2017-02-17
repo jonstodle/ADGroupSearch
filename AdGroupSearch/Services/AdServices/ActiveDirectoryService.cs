@@ -1,12 +1,8 @@
-﻿using AdGroupSearch.Services.SettingsServices;
+﻿using AdGroupSearch.Models;
 using System;
-using System.Collections.Generic;
 using System.DirectoryServices;
-using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.ActiveDirectory;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reactive.Linq;
 
 namespace AdGroupSearch.Services.AdServices
 {
@@ -19,42 +15,34 @@ namespace AdGroupSearch.Services.AdServices
 
 
 
-        PrincipalContext GetPrincipalContext() => new PrincipalContext(ContextType.Domain);
+        public string CurrentDomain => Domain.GetCurrentDomain().Name;
 
-        DirectoryEntry GetDirectoryEntry() => new DirectoryEntry($"LDAP://{Domain.GetCurrentDomain().Name}");
 
-        public Task<IEnumerable<SearchResult>> GetAdGroupsAsync(string searchTerm, params string[] propertiesToLoad)
+
+        public IObservable<ActiveDirectoryGroup> GetAllAdGroups() => Observable.Create<ActiveDirectoryGroup>(o =>
         {
-            return Task.Run<IEnumerable<SearchResult>>(() =>
+            var disposed = false;
+
+            using (var entry = _domainDirectoryEntry)
+            using (var searcher = new DirectorySearcher("(objectCategory=group)", new[] { "name", "description" }) { PageSize = 1000 })
             {
-                using (var entry = GetDirectoryEntry())
-                using (var searcher = new DirectorySearcher(entry))
+                foreach (SearchResult result in searcher.FindAll())
                 {
-                    searcher.PageSize = 1000;
-                    searcher.Filter = $"(&(objectCategory=group)(samaccountname={searchTerm}))";
+                    if (disposed) break;
 
-                    foreach (var prop in propertiesToLoad) { searcher.PropertiesToLoad.Add(prop); }
-
-                    var returnValue = new List<SearchResult>();
-                    using (var results = searcher.FindAll())
-                    {
-                        foreach (var result in results) { returnValue.Add((SearchResult)result); } 
-                    }
-
-                    return returnValue;
+                    var dirEntry = result.GetDirectoryEntry();
+                    o.OnNext(new ActiveDirectoryGroup(
+                        dirEntry.Properties["name"].Value?.ToString() ?? "",
+                        dirEntry.Properties["description"].Value?.ToString() ?? ""));
                 }
-            });
-        }
+            }
 
-        public Task<GroupPrincipal> GetPrincipalForGroupAsync(string identifier)
-        {
-            return Task.Run(() =>
-            {
-                //using (var context = GetPrincipalContext())
-                //{
-                    return GroupPrincipal.FindByIdentity(GetPrincipalContext(), identifier);
-                //}
-            });
-        }
+            o.OnCompleted();
+            return () => disposed = true;
+        });
+
+
+
+        private DirectoryEntry _domainDirectoryEntry => new DirectoryEntry($"LDAP://{CurrentDomain}");
     }
 }
