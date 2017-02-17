@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Realms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AdGroupSearch.Models
 {
-    public class ActiveDirectoryGroup
+    public class ActiveDirectoryGroup : RealmObject
     {
         public ActiveDirectoryGroup(string name, string description)
         {
