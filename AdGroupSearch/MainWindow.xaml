@@ -33,7 +33,7 @@
 
             <ToggleButton x:Name="UseFuzzyToggleButton" Content="Fuzzy" Grid.Column="1" Margin="2"/>
 
-            <Button x:Name="RefreshButton" Content="Refresh" Grid.ColumnSpan="2" Margin="2"/>
+            <Button x:Name="RefreshButton" Content="Refresh" Grid.Column="2" Margin="2"/>
         </Grid>
 
         <ListView x:Name="GroupsListView" Grid.Row="1" Margin="2">
