@@ -59,20 +59,20 @@
             <TextBlock TextAlignment="Center" FontSize="15">UPDATING GROUP CACHE</TextBlock>
         </Border>
 
-        <Grid Grid.Row="3" Margin="2">
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             
-            <TextBlock>
+            <TextBlock Margin="2">
                 <Run Text="Showing "/>
                 <Run x:Name="CurrentShowCountRun"/>
                 <Run Text=" of "/>
                 <Run x:Name="TotalCountRun"/>
             </TextBlock>
 
-            <TextBlock Text="By Jon Stødle" Grid.Column="1"/>
+            <TextBlock Text="By Jon Stødle" Grid.Column="1" Margin="2"/>
         </Grid>
     </Grid>
 </Window>
