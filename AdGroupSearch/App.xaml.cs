@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Akavache;
+using System;
 using System.IO;
+using System.Reactive.Linq;
 using System.Windows;
 
 namespace AdGroupSearch
@@ -12,6 +14,10 @@ namespace AdGroupSearch
         public App()
         {
             Directory.CreateDirectory(AppDataFolderPath);
+
+            this.Events().Exit
+                .SelectMany(_ => Observable.FromAsync(() => BlobCache.Shutdown()))
+                .Subscribe();
         }
 
 
