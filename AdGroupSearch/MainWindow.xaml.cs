@@ -27,6 +27,7 @@ namespace AdGroupSearch
                 this.OneWayBind(ViewModel, vm => vm.GroupsView, v => v.GroupsListView.ItemsSource).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.SelectedGroup, v => v.GroupsListView.SelectedItem).DisposeWith(disposables);
                 this.OneWayBind(ViewModel, vm => vm.IsExecutingLoadGroups, v => v.LoadingIndicatorBorder.Visibility).DisposeWith(disposables);
+                this.OneWayBind(ViewModel, vm => vm.GroupsView.Count, v => v.CurrentShowCountRun.Text).DisposeWith(disposables);
                 this.OneWayBind(ViewModel, vm => vm.Groups.Count, v => v.TotalCountRun.Text).DisposeWith(disposables);
 
                 this.BindCommand(ViewModel, vm => vm.LoadGroups, v => v.RefreshButton).DisposeWith(disposables);
