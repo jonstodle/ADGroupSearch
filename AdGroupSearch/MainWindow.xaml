@@ -31,7 +31,7 @@
             
             <TextBox x:Name="FilterTextBox" VerticalContentAlignment="Center" Margin="2"/>
 
-            <ToggleButton x:Name="UseFuzzyToggleButton" Content="Fuzzy" Grid.Column="1" Margin="2"/>
+            <ToggleButton x:Name="UseFuzzyToggleButton" Content="Fuzzy" Visibility="Collapsed" Grid.Column="1" Margin="2"/>
 
             <Button x:Name="RefreshButton" Content="Refresh" Grid.Column="2" Margin="2"/>
         </Grid>
