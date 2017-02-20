@@ -32,6 +32,13 @@ namespace AdGroupSearch.Services
 
         public static void AddOrUpdate(ActiveDirectoryGroup group) => _addSubject.OnNext(group);
 
+        public static IRealmCollection<ActiveDirectoryGroup> GetFilteredGroups(string filter)
+        {
+            var query = _realm.All<ActiveDirectoryGroup>();
+            foreach (var term in filter.Split(' ')) query = query.Where(x => x.Name.Contains(term) || x.Description.Contains(term));
+            return query.OrderBy(x => x.Name).AsRealmCollection();
+        }
+
 
 
         private static Realm _realm = Realm.GetInstance(Path.Combine(App.AppDataFolderPath, "default.realm"));
