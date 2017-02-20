@@ -35,7 +35,7 @@ namespace AdGroupSearch.Services
         public static IRealmCollection<ActiveDirectoryGroup> GetFilteredGroups(string filter)
         {
             var query = _realm.All<ActiveDirectoryGroup>();
-            foreach (var term in filter.Split(' ')) query = query.Where(x => x.Name.Contains(term) || x.Description.Contains(term));
+            foreach (var term in filter.Split(' ')) query = query.Where(x => x.Name.Contains(term, StringComparison.OrdinalIgnoreCase) || x.Description.Contains(term, StringComparison.OrdinalIgnoreCase));
             return query.OrderBy(x => x.Name).AsRealmCollection();
         }
 
