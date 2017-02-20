@@ -129,6 +129,7 @@
     </ApplicationDefinition>
     <Compile Include="AkavacheSqliteLinkerOverride.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Extensions\SystemExtensions.cs" />
     <Compile Include="Launch.cs" />
     <Compile Include="Models\ActiveDirectoryGroup.cs" />
     <Compile Include="Models\CacheContainer.cs" />

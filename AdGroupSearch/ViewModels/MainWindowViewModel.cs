@@ -6,6 +6,7 @@ using Realms;
 using System;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
@@ -22,6 +23,16 @@ namespace AdGroupSearch.ViewModels
 
             _isExecutingLoadGroups = _loadGroups.IsExecuting
                 .ToProperty(this, x => x.IsExecutingLoadGroups);
+
+            _groupsView = this.WhenAnyValue(x => x.FilterText)
+                .Throttle(TimeSpan.FromSeconds(1), DispatcherScheduler.Current)
+                .StartWith(FilterText)
+                .Select(x =>
+                {
+                    if (!x.HasValue()) return Groups;
+                    else return DBService.GetFilteredGroups(x);
+                })
+                .ToProperty(this, x => x.GroupsView);
 
 			FilterText = Environment.GetCommandLineArgs().Skip(1).FirstOrDefault();
 
@@ -43,6 +54,8 @@ namespace AdGroupSearch.ViewModels
         public bool IsExecutingLoadGroups => _isExecutingLoadGroups.Value;
 
         public IRealmCollection<ActiveDirectoryGroup> Groups => DBService.Groups;
+
+        public IRealmCollection<ActiveDirectoryGroup> GroupsView => _groupsView.Value;
 
         public string FilterText { get => _filterText; set => this.RaiseAndSetIfChanged(ref _filterText, value); }
 
@@ -87,6 +100,7 @@ namespace AdGroupSearch.ViewModels
         private readonly ReactiveCommand<Unit, ActiveDirectoryGroup> _loadGroups;
         private readonly ReactiveCommand<Unit, Unit> _copyGroupNameToClipboard;
         private readonly ObservableAsPropertyHelper<bool> _isExecutingLoadGroups;
+        private readonly ObservableAsPropertyHelper<IRealmCollection<ActiveDirectoryGroup>> _groupsView;
         private ViewModelActivator _activator = new ViewModelActivator();
         private string _filterText;
         private bool _useFuzzy;
