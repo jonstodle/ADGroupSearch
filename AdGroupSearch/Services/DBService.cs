@@ -34,7 +34,7 @@ namespace AdGroupSearch.Services
 
 
 
-        private static Realm _realm = Realm.GetInstance(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), App.ApplicationName, "default.realm"));
+        private static Realm _realm = Realm.GetInstance(Path.Combine(App.AppDataFolderPath, "default.realm"));
         private static Subject<ActiveDirectoryGroup> _addSubject = new Subject<ActiveDirectoryGroup>();
     }
 }
