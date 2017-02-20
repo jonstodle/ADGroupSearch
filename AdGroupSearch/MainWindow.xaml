@@ -3,25 +3,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AdGroupSearch"
-        xmlns:vm="clr-namespace:AdGroupSearch.ViewModels"
-        xmlns:converters="clr-namespace:AdGroupSearch.Converters"
         mc:Ignorable="d"
+        Padding="2"
         Icon="Assets/icon.ico"
         Title="AD Group Search" Height="600" Width="700" MinHeight="300" MinWidth="300">
-    <Window.Resources>
-        <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter"/>
 
+    <Window.Resources>
         <ContextMenu x:Key="GroupsContextMenu">
-            <MenuItem Header="Copy group name" Command="{Binding CopyGroupNameToClipboard, Source={x:Reference Name=VM}}"/>
+            <!--<MenuItem Header="Copy group name" Command="{Binding CopyGroupNameToClipboard, Source={x:Reference Name=VM}}"/>-->
         </ContextMenu>
     </Window.Resources>
-
-    <Window.DataContext>
-        <vm:MainWindowModel x:Name="VM"/>
-    </Window.DataContext>
-
-    <Grid Margin="5">
+    
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
@@ -36,32 +29,14 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             
-            <TextBox x:Name="FilterTextBox" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
+            <TextBox x:Name="FilterTextBox" VerticalContentAlignment="Center" Margin="2"/>
 
-            <ToggleButton Content="Fuzzy" IsChecked="{Binding UseFuzzyMatch}" Grid.Column="1" Margin="5,0,0,0"/>
+            <ToggleButton x:Name="UseFuzzyToggleButton" Content="Fuzzy" Grid.Column="1" Margin="2"/>
 
-            <Button x:Name="MenuButton" Grid.Column="2" Margin="5,0,0,0">
-                <Button.ContextMenu>
-                    <ContextMenu x:Name="MenuButtonContextMenu">
-                        <MenuItem Header="Update cache" Command="{Binding LoadGroups, Source={x:Reference Name=VM}}">
-                            <MenuItem.Icon>
-                                <Image Source="Assets/refresh.png"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-
-                        <MenuItem Header="Settings" Command="{Binding OpenSettingsWindow}">
-                            <MenuItem.Icon>
-                                <Image Source="Assets/gear.png"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                    </ContextMenu>
-                </Button.ContextMenu>
-
-                <Image Source="Assets/gear.png"/>
-            </Button>
+            <Button x:Name="RefreshButton" Content="Refresh" Grid.ColumnSpan="2" Margin="2"/>
         </Grid>
 
-        <ListView x:Name="GroupsListView" ItemsSource="{Binding ListCollectionView}" SelectedItem="{Binding SelectedItem}" Grid.Row="1" Margin="0,5,0,0">
+        <ListView x:Name="GroupsListView" Grid.Row="1" Margin="2">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Name" Width="270" DisplayMemberBinding="{Binding Name}" />
@@ -76,7 +51,7 @@
             </ListView.ItemContainerStyle>
         </ListView>
 
-        <Border Visibility="{Binding IsLoadingGroups, Converter={StaticResource BoolVisibilityConverter}}" Padding="0,5" Grid.Row="2" Margin="0,5,0,0">
+        <Border x:Name="LoadingIndicatorBorder" Padding="0,5" Grid.Row="2" Margin="2">
             <Border.Background>
                 <SolidColorBrush Color="Yellow" Opacity=".5"/>
             </Border.Background>
@@ -84,7 +59,7 @@
             <TextBlock TextAlignment="Center" FontSize="15">UPDATING GROUP CACHE</TextBlock>
         </Border>
 
-        <Grid Grid.Row="3" Margin="0,5,0,0">
+        <Grid Grid.Row="3" Margin="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto"/>
@@ -92,9 +67,9 @@
             
             <TextBlock>
                 <Run Text="Showing "/>
-                <Run Text="{Binding ListCollectionView.Count, Mode=OneWay}"/>
+                <Run x:Name="CurrentShowCountRun"/>
                 <Run Text=" of "/>
-                <Run Text="{Binding Groups.Count, Mode=OneWay}"/>
+                <Run x:Name="TotalCountRun"/>
             </TextBlock>
 
             <TextBlock Text="By Jon Stødle" Grid.Column="1"/>
