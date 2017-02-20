@@ -16,7 +16,7 @@ namespace AdGroupSearch.ViewModels
     {
         public MainWindowViewModel()
         {
-            _loadGroups = ReactiveCommand.CreateFromObservable(() => ActiveDirectoryService.Current.GetAllAdGroups().SubscribeOn(RxApp.TaskpoolScheduler));
+            _loadGroups = ReactiveCommand.CreateFromObservable(() => ActiveDirectoryService.Current.GetAllAdGroups().Do(_ => { }, () => StateService.LastCacheUpdate = DateTimeOffset.Now).SubscribeOn(RxApp.TaskpoolScheduler));
 
             _copyGroupNameToClipboard = ReactiveCommand.Create(() => Clipboard.SetText(_selectedGroup.Name));
 
@@ -28,9 +28,9 @@ namespace AdGroupSearch.ViewModels
             this.WhenActivated(disposables =>
             {
                 _loadGroups
-                .ObserveOnDispatcher()
-                .Subscribe(x => DBService.AddOrUpdate(x))
-                .DisposeWith(disposables);
+                    .ObserveOnDispatcher()
+                    .Subscribe(x => DBService.AddOrUpdate(x))
+                    .DisposeWith(disposables);
             });
         }
 

@@ -1,4 +1,5 @@
-﻿using AdGroupSearch.ViewModels;
+﻿using AdGroupSearch.Services;
+using AdGroupSearch.ViewModels;
 using ReactiveUI;
 using System;
 using System.Reactive;
@@ -31,6 +32,7 @@ namespace AdGroupSearch
                 this.BindCommand(ViewModel, vm => vm.LoadGroups, v => v.RefreshButton).DisposeWith(disposables);
 
                 Observable.Return(Unit.Default)
+                    .Where(_ => StateService.LastCacheUpdate < (DateTimeOffset.Now - TimeSpan.FromDays(5)))
                     .InvokeCommand(ViewModel.LoadGroups)
                     .DisposeWith(disposables);
 
