@@ -21,9 +21,6 @@ namespace AdGroupSearch.ViewModels
 
             _copyGroupNameToClipboard = ReactiveCommand.Create(() => Clipboard.SetText(_selectedGroup.Name));
 
-            _isExecutingLoadGroups = _loadGroups.IsExecuting
-                .ToProperty(this, x => x.IsExecutingLoadGroups);
-
             _groupsView = this.WhenAnyValue(x => x.FilterText)
                 .Throttle(TimeSpan.FromSeconds(1), DispatcherScheduler.Current)
                 .StartWith(FilterText)
@@ -50,8 +47,6 @@ namespace AdGroupSearch.ViewModels
         public ReactiveCommand LoadGroups => _loadGroups;
 
         public ReactiveCommand CopyGroupNameToClipboard => _copyGroupNameToClipboard;
-
-        public bool IsExecutingLoadGroups => _isExecutingLoadGroups.Value;
 
         public IRealmCollection<ActiveDirectoryGroup> Groups => DBService.Groups;
 
@@ -99,7 +94,6 @@ namespace AdGroupSearch.ViewModels
 
         private readonly ReactiveCommand<Unit, ActiveDirectoryGroup> _loadGroups;
         private readonly ReactiveCommand<Unit, Unit> _copyGroupNameToClipboard;
-        private readonly ObservableAsPropertyHelper<bool> _isExecutingLoadGroups;
         private readonly ObservableAsPropertyHelper<IRealmCollection<ActiveDirectoryGroup>> _groupsView;
         private ViewModelActivator _activator = new ViewModelActivator();
         private string _filterText;
