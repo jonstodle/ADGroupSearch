@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Padding="2"
+        Name="window"
         Icon="Assets/icon.ico"
         Title="AD Group Search" Height="600" Width="700" MinHeight="300" MinWidth="300">
 
     <Window.Resources>
         <ContextMenu x:Key="GroupsContextMenu">
-            <!--<MenuItem Header="Copy group name" Command="{Binding CopyGroupNameToClipboard, Source={x:Reference Name=VM}}"/>-->
+            <MenuItem Header="Copy group name" Command="{Binding ViewModel.CopyGroupNameToClipboard, Source={x:Reference window}}"/>
         </ContextMenu>
     </Window.Resources>
     
