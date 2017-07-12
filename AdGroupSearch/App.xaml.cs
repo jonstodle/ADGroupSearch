@@ -23,6 +23,6 @@ namespace AdGroupSearch
 
 
         public static string ApplicationName => "AD Group Search";
-        public static string AppDataFolderPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ApplicationName);
+        public static string AppDataFolderPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ApplicationName);
     }
 }
